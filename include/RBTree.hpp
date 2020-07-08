@@ -15,11 +15,18 @@ enum Color {
 struct TreeNode {
     int value;
     Color color;
-    std::shared_ptr<TreeNode> parent;
-    std::shared_ptr<TreeNode> left_node;
-    std::shared_ptr<TreeNode> right_node;
+    std::shared_ptr<TreeNode> parent = nullptr;
+    std::shared_ptr<TreeNode> left_child = nullptr;
+    std::shared_ptr<TreeNode> right_child = nullptr;
+
+    explicit TreeNode(int val, Color cl = BLACK)
+            : value(val), color(cl) {};
 };
 
+/*
+ * Currently assume that only different value will be took in
+ * TODO: consider dealing with multiple same values
+ */
 class RBTree {
 public:
     RBTree() = default;
