@@ -6,14 +6,14 @@
 #include <gtest/gtest.h>
 
 
-class RBTreeTest : public ::testing::Test {
+class RBTreeInsertTest : public ::testing::Test {
 
-}
+};
 
 
 // sample of insertion
 
-TEST_F(/*test suit name*/ RBTreeTest, /*test case name*/ InsertNullTree
+TEST_F(/*test suit name*/ RBTreeInsertTest, /*test case name*/ InsertNullTree
 ) {
 // ASSERT_EQ(6, insert(36));
 // ASSERT_EQ(true, find(76));
