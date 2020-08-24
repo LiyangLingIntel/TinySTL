@@ -18,6 +18,16 @@ struct TreeNode {
     std::shared_ptr<TreeNode> parent;
     std::shared_ptr<TreeNode> left_node;
     std::shared_ptr<TreeNode> right_node;
+
+    TreeNode() = delete;
+
+    explicit TreeNode(int val, Color cl = RED, const std::shared_ptr<TreeNode> &p_node = nullptr) {
+        value = val;
+        color = cl;
+        parent = p_node;
+        left_node = nullptr;
+        right_node = nullptr;
+    }
 };
 
 class RBTree {
@@ -33,6 +43,17 @@ public:
     bool insert(int value);
 
     bool remove(int value);
+
+    std::shared_ptr<TreeNode> get_root();
+
+protected:
+    void left_rotate(std::shared_ptr<TreeNode> &node);
+
+    void right_rotate(std::shared_ptr<TreeNode> &node);
+
+    void insert_fix(std::shared_ptr<TreeNode>);
+
+    void delete_fix(std::shared_ptr<TreeNode>);
 
 private:
     std::shared_ptr<TreeNode> root_node = nullptr;
