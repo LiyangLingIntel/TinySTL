@@ -17,10 +17,7 @@ shared_ptr<TreeNode> RBTree::find(int value) {
     while (curr_node != nullptr) {
         if (value == curr_node->value)
             return curr_node;
-        if (value > curr_node->value)
-            curr_node = curr_node->right_node;
-        else
-            curr_node = curr_node->left_node;
+        curr_node = (value > curr_node->value) ? curr_node->right_node : curr_node->left_node;
     }
     return nullptr;
 }
@@ -45,7 +42,12 @@ bool RBTree::insert(int value) {
 }
 
 bool RBTree::remove(int value) {
-    return false;
+    auto tgt_node = find(value);
+    if (tgt_node == nullptr)
+        return false;
+
+    remove_fix(tgt_node);
+    return true;
 }
 
 void RBTree::left_rotate(shared_ptr<TreeNode> &node) {
@@ -60,11 +62,11 @@ shared_ptr<TreeNode> RBTree::get_root() {
     return root_node;
 }
 
-void RBTree::insert_fix(shared_ptr<TreeNode>) {
+void RBTree::insert_fix(shared_ptr<TreeNode> &node) {
 
 }
 
-void RBTree::delete_fix(shared_ptr<TreeNode>) {
+void RBTree::remove_fix(shared_ptr<TreeNode> &node) {
 
 }
 

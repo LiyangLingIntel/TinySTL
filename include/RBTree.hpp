@@ -57,9 +57,9 @@ protected:
 
     void right_rotate(std::shared_ptr<TreeNode> &node);
 
-    void insert_fix(std::shared_ptr<TreeNode>);
+    void insert_fix(std::shared_ptr<TreeNode> &node);
 
-    void delete_fix(std::shared_ptr<TreeNode>);
+    void remove_fix(std::shared_ptr<TreeNode> &node);
 
 private:
     std::shared_ptr<TreeNode> root_node = nullptr;
