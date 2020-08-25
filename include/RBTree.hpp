@@ -30,6 +30,10 @@ struct TreeNode {
     }
 };
 
+/*
+ * Currently assume that only different value will be took in
+ * TODO: consider dealing with multiple same values
+ */
 class RBTree {
 public:
     RBTree() = default;

@@ -23,10 +23,6 @@ shared_ptr<TreeNode> RBTree::find(int value) {
     return nullptr;
 }
 
-shared_ptr<TreeNode> &get_ref(shared_ptr<TreeNode> &node) {
-    return node;
-}
-
 bool RBTree::insert(int value) {
     if (root_node == nullptr) {
         root_node = make_shared<TreeNode>(TreeNode(value, BLACK));
