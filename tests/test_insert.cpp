@@ -4,7 +4,7 @@
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
-
+#include <RBTree.hpp>
 
 class RBTreeInsertTest : public ::testing::Test {
 
@@ -15,6 +15,8 @@ class RBTreeInsertTest : public ::testing::Test {
 
 TEST_F(/*test suit name*/ RBTreeInsertTest, /*test case name*/ InsertNullTree
 ) {
+    RBTree rbtree({5, 7, 8, 3, 2, 6, 4});
+    rbtree.print();
 // ASSERT_EQ(6, insert(36));
 // ASSERT_EQ(true, find(76));
 }

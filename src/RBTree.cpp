@@ -1,6 +1,8 @@
 //
 // Created by liyangling on 7/8/20.
 //
+#include <iomanip>
+#include <iostream>
 #include <RBTree.hpp>
 
 using namespace std;
@@ -64,4 +66,28 @@ void RBTree::insert_fix(shared_ptr<TreeNode>) {
 
 void RBTree::delete_fix(shared_ptr<TreeNode>) {
 
+}
+
+void RBTree::print(const shared_ptr<TreeNode> &node, int node_count) {
+    auto curr_node = (node == nullptr) ? root_node : node;
+    cout.flags(ios::right);
+    if (curr_node != nullptr) {
+        auto clr = (curr_node->color) ? 'B' : 'R';
+        cout << "(" << clr << "," << setw(3) << curr_node->value << ")";
+
+        if (curr_node->right_node != nullptr) {
+            cout << " - ";
+            print(curr_node->right_node, node_count + 1);
+        }
+        if (curr_node->left_node != nullptr) {
+            cout << "\n";
+            for (int i = 0; i < (7 + 10 * node_count); i++)
+                cout << " ";
+            cout << " \\ \n";
+            for (int i = 0; i < (7 + 10 * node_count); i++)
+                cout << " ";
+            cout << "   ";
+            print(curr_node->left_node, node_count + 1);
+        }
+    }
 }

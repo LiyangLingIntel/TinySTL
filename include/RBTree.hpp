@@ -50,6 +50,8 @@ public:
 
     std::shared_ptr<TreeNode> get_root();
 
+    void print(const std::shared_ptr<TreeNode> &node = nullptr, int node_count = 0);
+
 protected:
     void left_rotate(std::shared_ptr<TreeNode> &node);
 
