@@ -53,6 +53,8 @@ public:
     void print(const std::shared_ptr<TreeNode> &node = nullptr, int node_count = 0);
 
 protected:
+    std::shared_ptr<TreeNode> &get_ref(std::shared_ptr<TreeNode> &node);
+
     void left_rotate(std::shared_ptr<TreeNode> &node);
 
     void right_rotate(std::shared_ptr<TreeNode> &node);

@@ -50,12 +50,42 @@ bool RBTree::remove(int value) {
     return true;
 }
 
-void RBTree::left_rotate(shared_ptr<TreeNode> &node) {
+shared_ptr<TreeNode> &RBTree::get_ref(shared_ptr<TreeNode> &node) {
+    if (!node->parent)
+        return root_node;
+    if (node == node->parent->left_node)
+        return node->parent->left_node;
+    else
+        return node->parent->right_node;
+}
 
+// TODO use one rotate function instead of left & right rotate
+void RBTree::left_rotate(shared_ptr<TreeNode> &node) {
+    auto parent = node->parent;
+    auto left_node = node->left_node;
+    auto parent_pos = get_ref(parent);
+
+    node->parent = parent->parent;
+    node->left_node = parent;
+    parent->parent = node;
+    parent->right_node = left_node;
+    if (left_node)
+        left_node->parent = parent;
+    parent_pos = node;
 }
 
 void RBTree::right_rotate(shared_ptr<TreeNode> &node) {
+    auto parent = node->parent;
+    auto right_node = node->right_node;
+    auto parent_pos = get_ref(parent);
 
+    node->parent = parent->parent;
+    node->right_node = parent;
+    parent->parent = node;
+    parent->left_node = right_node;
+    if (right_node)
+        right_node->parent = parent;
+    parent_pos = node;
 }
 
 shared_ptr<TreeNode> RBTree::get_root() {
