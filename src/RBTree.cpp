@@ -46,8 +46,35 @@ bool RBTree::remove(int value) {
     if (tgt_node == nullptr)
         return false;
 
-    remove_fix(tgt_node);
+    shared_ptr<TreeNode> &tgt_slot = get_ref(tgt_node);
+    if (tgt_node->left_node == nullptr && tgt_node->right_node == nullptr)
+        tgt_slot = nullptr;
+    else if (tgt_node->left_node == nullptr)
+        tgt_slot = tgt_node->right_node;
+    else if (tgt_node->right_node == nullptr)
+        tgt_slot = tgt_node->left_node;
+    else {
+        auto left_max = get_max(tgt_node->left_node);
+        left_max->parent->right_node = nullptr;
+        left_max->parent = tgt_node->parent;
+        left_max->right_node = tgt_node->right_node;
+        tgt_node->right_node->parent = left_max;
+
+        auto new_left_node = (left_max == tgt_node->left_node) ? tgt_node->left_node->left_node : tgt_node->left_node;
+        left_max->left_node = new_left_node;
+        if (new_left_node != nullptr)
+            new_left_node->parent = left_max;
+        tgt_slot = left_max;
+    }
+//    remove_fix(tgt_node);
     return true;
+}
+
+std::shared_ptr<TreeNode> RBTree::get_max(const std::shared_ptr<TreeNode> &node) {
+    auto curr_node = (node != nullptr) ? node : root_node;
+    if (curr_node->right_node == nullptr)
+        return curr_node;
+    return get_max(curr_node->right_node);
 }
 
 shared_ptr<TreeNode> &RBTree::get_ref(shared_ptr<TreeNode> &node) {
@@ -63,7 +90,7 @@ shared_ptr<TreeNode> &RBTree::get_ref(shared_ptr<TreeNode> &node) {
 void RBTree::left_rotate(shared_ptr<TreeNode> &node) {
     auto parent = node->parent;
     auto left_node = node->left_node;
-    auto parent_pos = get_ref(parent);
+    shared_ptr<TreeNode> &parent_pos = get_ref(parent);
 
     node->parent = parent->parent;
     node->left_node = parent;
@@ -77,7 +104,7 @@ void RBTree::left_rotate(shared_ptr<TreeNode> &node) {
 void RBTree::right_rotate(shared_ptr<TreeNode> &node) {
     auto parent = node->parent;
     auto right_node = node->right_node;
-    auto parent_pos = get_ref(parent);
+    shared_ptr<TreeNode> &parent_pos = get_ref(parent);
 
     node->parent = parent->parent;
     node->right_node = parent;
@@ -93,7 +120,47 @@ shared_ptr<TreeNode> RBTree::get_root() {
 }
 
 void RBTree::insert_fix(shared_ptr<TreeNode> &node) {
-
+    auto parent = node->parent;
+    // case1: insert node is root node
+    if (!parent) {
+        node->color = BLACK;
+        return;
+    }
+    // case2: insert node has BLACK parent
+    if (parent->color == BLACK)
+        return;
+    // case34: RED parent and BLACK uncle
+    auto curr = node;
+    auto grandparent = parent->parent;
+    auto is_left_parent = parent == grandparent->left_node;
+    auto uncle = (is_left_parent) ? grandparent->right_node : grandparent->left_node;
+    if (uncle == nullptr || uncle->color == BLACK) {
+        if (is_left_parent) {
+            if (node == parent->right_node) {
+                left_rotate(node);
+                insert_fix(parent);
+            } else {
+                right_rotate(parent);
+            }
+        } else {
+            if (node == parent->left_node) {
+                right_rotate(node);
+                insert_fix(parent);
+            } else {
+                parent->color = BLACK;
+                grandparent->color = RED;
+                left_rotate(parent);
+            }
+        }
+        return;
+    }
+    // case5: RED parent and RED uncle
+    if (uncle->color == RED) {
+        parent->color = BLACK;
+        uncle->color = BLACK;
+        grandparent->color = RED;
+        insert_fix(grandparent);
+    }
 }
 
 void RBTree::remove_fix(shared_ptr<TreeNode> &node) {
@@ -122,4 +189,6 @@ void RBTree::print(const shared_ptr<TreeNode> &node, int node_count) {
             print(curr_node->left_node, node_count + 1);
         }
     }
+    if (node_count==0)
+        cout << endl;
 }
