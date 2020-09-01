@@ -33,11 +33,12 @@ TEST_F(/*test suit name*/ RBTreeInsertTest, /*test case name*/ InsertNullTree) {
 }
 
 TEST_F(/*test suit name*/ RBTreeRemoveTest, /*test case name*/ RemoveNode) {
-    RBTree rbtree({5, 7, 8, 6, 3, 2, 36, 4, 17});
+    RBTree rbtree({5, 7, 8, 6, 3, 2, 36, 4, 17, 35, 34, 33, 32, 31});
     rbtree.print();
-    ASSERT_EQ(rbtree.remove(36), true);
-    ASSERT_EQ(rbtree.remove(2), true);
-    ASSERT_EQ(rbtree.remove(5), true);
-    ASSERT_EQ(rbtree.remove(999), false);
+    ASSERT_EQ(rbtree.remove(33), true);
+//    ASSERT_EQ(rbtree.remove(2), true);
+//    ASSERT_EQ(rbtree.remove(5), true);
+//    ASSERT_EQ(rbtree.remove(7), true);
+//    ASSERT_EQ(rbtree.remove(999), false);
     rbtree.print();
 }

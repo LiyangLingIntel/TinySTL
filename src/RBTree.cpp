@@ -46,45 +46,26 @@ bool RBTree::remove(int value) {
     if (tgt_node == nullptr)
         return false;
 
-    shared_ptr<TreeNode> &tgt_slot = get_ref(tgt_node);
-    if (tgt_node->left_node == nullptr && tgt_node->right_node == nullptr)
-        tgt_slot = nullptr;
-    else if (tgt_node->left_node == nullptr)
-        tgt_slot = tgt_node->right_node;
-    else if (tgt_node->right_node == nullptr)
-        tgt_slot = tgt_node->left_node;
-    else {
-        auto left_max = get_max(tgt_node->left_node);
-        left_max->parent->right_node = nullptr;
-        left_max->parent = tgt_node->parent;
-        left_max->right_node = tgt_node->right_node;
-        tgt_node->right_node->parent = left_max;
+    auto sub_max_node = get_sub_max(tgt_node);
+    tgt_node->value = sub_max_node->value;
+    shared_ptr<TreeNode> &sub_max_slot = sub_max_node->parent->right_node;
 
-        auto new_left_node = (left_max == tgt_node->left_node) ? tgt_node->left_node->left_node : tgt_node->left_node;
-        left_max->left_node = new_left_node;
-        if (new_left_node != nullptr)
-            new_left_node->parent = left_max;
-        tgt_slot = left_max;
+    if (sub_max_node->color == RED) {
+        sub_max_node->left_node->parent = sub_max_node->parent;
+        sub_max_slot = sub_max_node->left_node;
+    } else if (sub_max_node->left_node->color == RED) {
+        sub_max_node->left_node->color = BLACK;
+        sub_max_node->left_node->parent = sub_max_node->parent;
+        sub_max_slot = sub_max_node->left_node;
+    } else {
+        sub_max_node->left_node->parent = sub_max_node->parent;
+        sub_max_slot = sub_max_node->left_node;
+        remove_fix(sub_max_slot);
     }
-//    remove_fix(tgt_node);
+
     return true;
 }
 
-std::shared_ptr<TreeNode> RBTree::get_max(const std::shared_ptr<TreeNode> &node) {
-    auto curr_node = (node != nullptr) ? node : root_node;
-    if (curr_node->right_node == nullptr)
-        return curr_node;
-    return get_max(curr_node->right_node);
-}
-
-shared_ptr<TreeNode> &RBTree::get_ref(shared_ptr<TreeNode> &node) {
-    if (!node->parent)
-        return root_node;
-    if (node == node->parent->left_node)
-        return node->parent->left_node;
-    else
-        return node->parent->right_node;
-}
 
 // TODO use one rotate function instead of left & right rotate
 void RBTree::left_rotate(shared_ptr<TreeNode> &node) {
@@ -130,7 +111,6 @@ void RBTree::insert_fix(shared_ptr<TreeNode> &node) {
     if (parent->color == BLACK)
         return;
     // case34: RED parent and BLACK uncle
-    auto curr = node;
     auto grandparent = parent->parent;
     auto is_left_parent = parent == grandparent->left_node;
     auto uncle = (is_left_parent) ? grandparent->right_node : grandparent->left_node;
@@ -140,6 +120,8 @@ void RBTree::insert_fix(shared_ptr<TreeNode> &node) {
                 left_rotate(node);
                 insert_fix(parent);
             } else {
+                parent->color = BLACK;
+                grandparent->color = RED;
                 right_rotate(parent);
             }
         } else {
@@ -164,7 +146,60 @@ void RBTree::insert_fix(shared_ptr<TreeNode> &node) {
 }
 
 void RBTree::remove_fix(shared_ptr<TreeNode> &node) {
+    // case1: new node is root node
+    if (node == root_node)
+        return;
 
+    auto parent = node->parent;
+    auto is_left_node = node == parent->left_node;
+    auto sibling = (is_left_node) ? parent->right_node : parent->left_node;
+    // case2: RED sibling
+    if (sibling->color == RED) {
+        if (is_left_node)
+            left_rotate(sibling);
+        else
+            right_rotate(sibling);
+//        swap_color(parent, parent->parent);
+        parent->color = RED;
+        sibling->color = BLACK;
+        remove_fix(node);
+    } else { // case3456: BLACK sibling
+        // case3: BLACK sibling, sibling children, parent
+        if (parent->color == BLACK && (sibling->left_node == nullptr || sibling->left_node->color == BLACK) &&
+            (sibling->right_node == nullptr || sibling->right_node->color == BLACK)) {
+            sibling->color = RED;
+            remove_fix(node);
+        }
+        // case4: BLACK sibling, sibling children; RED parent
+        else if (parent->color == RED && (sibling->left_node == nullptr || sibling->left_node->color == BLACK) &&
+                   (sibling->right_node == nullptr || sibling->right_node->color == BLACK)) {
+//            swap_color(sibling, parent);
+            parent->color = BLACK;
+            sibling->color = RED;
+        }
+        // case56: BLACK sibling; RED BLACK sibling children
+        else if (is_left_node) {
+            if ((sibling->right_node == nullptr || sibling->right_node->color == BLACK) && sibling->left_node->color == RED) {
+                sibling->left_node->color = BLACK;
+                sibling->color = RED;
+                right_rotate(sibling->left_node);
+            } else {
+                swap_color(sibling, parent);
+                left_rotate(sibling);
+                sibling->right_node->color = BLACK;
+            }
+        } else {
+            if ((sibling->left_node == nullptr || sibling->left_node->color == BLACK) && sibling->right_node->color == RED) {
+                sibling->right_node->color = BLACK;
+                sibling->color = RED;
+                left_rotate(sibling->right_node);
+            } else {
+                swap_color(sibling, parent);
+                right_rotate(sibling);
+                sibling->left_node->color = BLACK;
+            }
+        }
+    }
 }
 
 void RBTree::print(const shared_ptr<TreeNode> &node, int node_count) {
@@ -189,6 +224,31 @@ void RBTree::print(const shared_ptr<TreeNode> &node, int node_count) {
             print(curr_node->left_node, node_count + 1);
         }
     }
-    if (node_count==0)
+    if (node_count == 0)
         cout << endl;
+}
+
+std::shared_ptr<TreeNode> RBTree::get_sub_max(const std::shared_ptr<TreeNode> &node) {
+    if (node == nullptr)
+        return nullptr;
+    if (node->right_node == nullptr)
+        return node;
+    return get_sub_max(node->right_node);
+}
+
+shared_ptr<TreeNode> &RBTree::get_ref(shared_ptr<TreeNode> &node) {
+    if (!node->parent)
+        return root_node;
+    if (node == node->parent->left_node)
+        return node->parent->left_node;
+    else
+        return node->parent->right_node;
+}
+
+void RBTree::swap_color(shared_ptr<TreeNode> &lhs, shared_ptr<TreeNode> &rhs) {
+    assert(lhs != nullptr);
+    assert(rhs != nullptr);
+    auto temp_color = lhs->color;
+    lhs->color = rhs->color;
+    rhs->color = temp_color;
 }

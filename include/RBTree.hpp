@@ -50,7 +50,7 @@ public:
 
     std::shared_ptr<TreeNode> get_root();
 
-    std::shared_ptr<TreeNode> get_max(const std::shared_ptr<TreeNode> &node = nullptr);
+    std::shared_ptr<TreeNode> get_sub_max(const std::shared_ptr<TreeNode> &node);
 
     void print(const std::shared_ptr<TreeNode> &node = nullptr, int node_count = 0);
 
@@ -64,6 +64,8 @@ protected:
     void insert_fix(std::shared_ptr<TreeNode> &node);
 
     void remove_fix(std::shared_ptr<TreeNode> &node);
+
+    void swap_color(std::shared_ptr<TreeNode> &lhs, std::shared_ptr<TreeNode> &rhs);
 
 private:
     std::shared_ptr<TreeNode> root_node = nullptr;
